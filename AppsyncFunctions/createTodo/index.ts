@@ -11,14 +11,14 @@ import { ulid } from "ulid";
 const client = new DynamoDBClient({
   region: "us-east-1",
 });
-const TABLe_NAME = "Todos";
+const TABLE_NAME = "Todos";
 
 export const handler = async (event: AppSyncResolverEvent<any>) => {
   console.log(JSON.stringify(event, null, 2));
   const { UserID, title } = event.arguments.input;
   const TodoID = ulid();
   const params: PutItemCommandInput = {
-    TableName: "Todos",
+    TableName: TABLE_NAME,
     Item: marshall({
       UserID,
       TodoID,

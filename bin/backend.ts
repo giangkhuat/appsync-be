@@ -18,5 +18,6 @@ const authStack = new AuthStack(app, "AuthStack", {
 
 const appsyncStack = new AppsyncStack(app, "Appsyncstack", {
   userPool: authStack.todoUserPool,
-  createTodoFunc: computeStack.createTodoFunc
+  createTodoFunc: computeStack.createTodoFunc,
+  listTodoFunc: computeStack.listTodoFunc
 });

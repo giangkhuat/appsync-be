@@ -9,7 +9,7 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "deploy": "cdk synth && cdk deploy --all"
+    "deploy": "cdk synth && cdk deploy --all --profile gkhuat"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",

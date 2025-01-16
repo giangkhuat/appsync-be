@@ -16,6 +16,7 @@ export class ComputeStack extends cdk.Stack {
    
   // appsync resolvers
   public readonly createTodoFunc: NodejsFunction;
+  public readonly listTodoFunc: NodejsFunction;
 
 
 
@@ -23,6 +24,7 @@ export class ComputeStack extends cdk.Stack {
     super(scope, id, props);
     this.addUserToTableFunc = this.addUserToUsersTable(props);
     this.createTodoFunc = this.createTodoFunction(props);
+    this.listTodoFunc = this.listTodoFunction(props);
   }
 
   addUserToUsersTable(props: ComputeStackProps) {
@@ -52,8 +54,27 @@ export class ComputeStack extends cdk.Stack {
         "../AppsyncFunctions/createTodo/index.ts"
       ),
     });
+    // this adds permission for lambda to access that resource
      func.addToRolePolicy( new iam.PolicyStatement({
         actions: ["dynamodb:PutItem"],
+        resources: [props.todosTable.tableArn as string]
+     }) )
+     return func;
+  }
+
+  listTodoFunction(props: ComputeStackProps) {
+    const func = new NodejsFunction(this, "listTodoFunc", {
+      functionName: "listTodoFunc",
+      runtime: Runtime.NODEJS_20_X,
+      handler: "handler",
+      entry: path.join(
+        __dirname,
+        "../AppsyncFunctions/listToDo/index.ts"
+      ),
+    });
+    // this adds permission for lambda to access that resource
+     func.addToRolePolicy( new iam.PolicyStatement({
+        actions: ["dynamodb:Query"],
         resources: [props.todosTable.tableArn as string]
      }) )
      return func;
