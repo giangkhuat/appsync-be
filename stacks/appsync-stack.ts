@@ -9,6 +9,8 @@ interface AppsyncStackProps extends cdk.StackProps {
   userPool: UserPool;
   createTodoFunc: NodejsFunction;
   listTodoFunc: NodejsFunction;
+  deleteTodoFunc: NodejsFunction;
+  updateTodoFunc: NodejsFunction;
 }
 
 export class AppsyncStack extends cdk.Stack {
@@ -18,6 +20,8 @@ export class AppsyncStack extends cdk.Stack {
     this.api = this.createAppsyncApi(props);
     this.createTodoResolver(scope, props, this.api);
     this.listTodoResolver(scope, props, this.api);
+    this.deleteTodoResolver(scope, props, this.api);
+    this.updateTodoResolver(scope, props, this.api);
   }
 
   createAppsyncApi(props: AppsyncStackProps) {
@@ -56,7 +60,7 @@ export class AppsyncStack extends cdk.Stack {
   ) {
     const createToDoResolve = api
       .addLambdaDataSource("CreateTodoDataSource", props.createTodoFunc)
-      .createResolver("CreateTodoMutaiton", {
+      .createResolver("CreateTodoMutation", {
         typeName: "Mutation",
         fieldName: "createTodo",
       });
@@ -69,9 +73,35 @@ export class AppsyncStack extends cdk.Stack {
   ) {
     const listToDoResolve = api
       .addLambdaDataSource("ListTodoDataSource", props.listTodoFunc)
-      .createResolver("ListTodoMutaiton", {
+      .createResolver("ListTodoMutation", {
         typeName: "Query",
         fieldName: "listTodos",
+      });
+  }
+
+  deleteTodoResolver(
+    scope: Construct,
+    props: AppsyncStackProps,
+    api: awsAppsync.GraphqlApi
+  ) {
+    const deleteToDoResolve = api
+      .addLambdaDataSource("DeleteTodoDataSource", props.deleteTodoFunc)
+      .createResolver("DeleteTodoMutation", {
+        typeName: "Mutation",
+        fieldName: "deleteTodo",
+      });
+  }
+
+  updateTodoResolver(
+    scope: Construct,
+    props: AppsyncStackProps,
+    api: awsAppsync.GraphqlApi
+  ) {
+    const updateToDoResolve = api
+      .addLambdaDataSource("UpdateTodoDataSource", props.updateTodoFunc)
+      .createResolver("UpdateTodoMutation", {
+        typeName: "Mutation",
+        fieldName: "updateTodo",
       });
   }
 }

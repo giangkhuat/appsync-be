@@ -13,18 +13,20 @@ interface ComputeStackProps extends cdk.StackProps {
 
 export class ComputeStack extends cdk.Stack {
   public readonly addUserToTableFunc: NodejsFunction;
-   
+
   // appsync resolvers
   public readonly createTodoFunc: NodejsFunction;
   public readonly listTodoFunc: NodejsFunction;
-
-
+  public readonly deleteTodoFunc: NodejsFunction;
+  public readonly updateTodoFunc: NodejsFunction;
 
   constructor(scope: Construct, id: string, props: ComputeStackProps) {
     super(scope, id, props);
     this.addUserToTableFunc = this.addUserToUsersTable(props);
     this.createTodoFunc = this.createTodoFunction(props);
     this.listTodoFunc = this.listTodoFunction(props);
+    this.deleteTodoFunc = this.deleteTodoFunction(props);
+    this.updateTodoFunc = this.updateTodoFunction(props);
   }
 
   addUserToUsersTable(props: ComputeStackProps) {
@@ -37,11 +39,13 @@ export class ComputeStack extends cdk.Stack {
         "../functions/AddUserPostConfirmation/index.ts"
       ),
     });
-     func.addToRolePolicy( new iam.PolicyStatement({
+    func.addToRolePolicy(
+      new iam.PolicyStatement({
         actions: ["dynamodb:PutItem"],
-        resources: [props.usersTable.tableArn as string]
-     }) )
-     return func;
+        resources: [props.usersTable.tableArn as string],
+      })
+    );
+    return func;
   }
 
   createTodoFunction(props: ComputeStackProps) {
@@ -49,17 +53,16 @@ export class ComputeStack extends cdk.Stack {
       functionName: "createTodoFunc",
       runtime: Runtime.NODEJS_20_X,
       handler: "handler",
-      entry: path.join(
-        __dirname,
-        "../AppsyncFunctions/createTodo/index.ts"
-      ),
+      entry: path.join(__dirname, "../AppsyncFunctions/createTodo/index.ts"),
     });
     // this adds permission for lambda to access that resource
-     func.addToRolePolicy( new iam.PolicyStatement({
+    func.addToRolePolicy(
+      new iam.PolicyStatement({
         actions: ["dynamodb:PutItem"],
-        resources: [props.todosTable.tableArn as string]
-     }) )
-     return func;
+        resources: [props.todosTable.tableArn as string],
+      })
+    );
+    return func;
   }
 
   listTodoFunction(props: ComputeStackProps) {
@@ -67,16 +70,55 @@ export class ComputeStack extends cdk.Stack {
       functionName: "listTodoFunc",
       runtime: Runtime.NODEJS_20_X,
       handler: "handler",
-      entry: path.join(
-        __dirname,
-        "../AppsyncFunctions/listToDo/index.ts"
-      ),
+      entry: path.join(__dirname, "../AppsyncFunctions/listTodo/index.ts"),
     });
     // this adds permission for lambda to access that resource
-     func.addToRolePolicy( new iam.PolicyStatement({
+    func.addToRolePolicy(
+      new iam.PolicyStatement({
         actions: ["dynamodb:Query"],
-        resources: [props.todosTable.tableArn as string]
-     }) )
-     return func;
+        resources: [props.todosTable.tableArn as string],
+      })
+    );
+    return func;
+  }
+
+  deleteTodoFunction(props: ComputeStackProps) {
+    const func = new NodejsFunction(this, "deleteTodoFunc", {
+      functionName: "deleteTodoFunc",
+      runtime: Runtime.NODEJS_20_X,
+      handler: "handler",
+      entry: path.join(__dirname, "../AppsyncFunctions/deleteTodo/index.ts"),
+    });
+    // this adds permission for lambda to access that resource
+    func.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ["dynamodb:Query", "dynamodb:DeleteItem"],
+        resources: [
+          props.todosTable.tableArn as string,
+          props.todosTable.tableArn + "/index/getTodoId",
+        ],
+      })
+    );
+    return func;
+  }
+
+  updateTodoFunction(props: ComputeStackProps) {
+    const func = new NodejsFunction(this, "updateTodoFunc", {
+      functionName: "updateTodoFunc",
+      runtime: Runtime.NODEJS_20_X,
+      handler: "handler",
+      entry: path.join(__dirname, "../AppsyncFunctions/updateTodo/index.ts"),
+    });
+    // this adds permission for lambda to access that resource
+    func.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ["dynamodb:Query", "dynamodb:UpdateItem"],
+        resources: [
+          props.todosTable.tableArn as string,
+          props.todosTable.tableArn + "/index/getTodoId",
+        ],
+      })
+    );
+    return func;
   }
 }
