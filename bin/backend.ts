@@ -22,4 +22,5 @@ const appsyncStack = new AppsyncStack(app, "Appsyncstack", {
   listTodoFunc: computeStack.listTodoFunc,
   deleteTodoFunc: computeStack.deleteTodoFunc,
   updateTodoFunc: computeStack.updateTodoFunc,
+  listAllTodoFunc: computeStack.listAllTodoFunc,
 });

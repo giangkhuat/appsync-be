@@ -36,4 +36,5 @@ type Mutation {
 
 type Query {
   listTodos(UserID: ID!): [Todo]
+  listAllTodos: [Todo]
 }
