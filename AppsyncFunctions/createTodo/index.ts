@@ -15,7 +15,7 @@ const TABLE_NAME = "Todos";
 
 export const handler = async (event: AppSyncResolverEvent<any>) => {
   console.log(JSON.stringify(event, null, 2));
-  const { UserID, title } = event.arguments.input;
+  const { UserID, title, channel } = event.arguments.input;
   const TodoID = ulid();
   const params: PutItemCommandInput = {
     TableName: TABLE_NAME,
@@ -24,6 +24,7 @@ export const handler = async (event: AppSyncResolverEvent<any>) => {
       TodoID,
       title,
       completed: false,
+      channel
     }),
   };
   console.log("TODO id = ", TodoID);

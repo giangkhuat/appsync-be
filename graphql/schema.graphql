@@ -9,11 +9,13 @@ type Todo {
   UserID: ID!
   title: String!
   completed: Boolean!
+  channel: String
 }
 
 input CreateTodoInput {
   UserID: ID!
   title: String!
+  channel: String
 }
 
 input UpdateTodoInput {
